@@ -12,13 +12,30 @@ class Block {
         this.data = data;
         this.previoushash = previoushash;
         this.hash = this.calculateHash();
+        this.nonce = 0;
     }
 
     // we use sha256 method to return hash containing the encrypted data
     // through calculatehash method to generate unique hash for each block
     calculateHash() {
-        return SHA256(this.index + this.previoushash + this.timestamp + JSON.stringify(this.data)).toString();
+        return SHA256(this.index + this.previoushash + this.timestamp + JSON.stringify(this.data) + this.nonce).toString();
     }
+
+    // this method is added to ensure the prof of work 
+    // as in real world to get new block this require compution power which called mining
+    // the difficulty determine the number of Zero's at the start of the hash
+    // this prevent spammer to add fake new block to the chain
+    mineBlock(difficulty) {
+        // this is infinte loop basicaly so we need to add nonce to the hash 
+        // nonce is just a random number added to not change any important data for the block
+        // to be able to reach break point 
+        while (this.hash.substring(0, difficulty) !== Array(difficulty + 1).join("0")) {
+            this.nonce++;
+            this.hash = this.calculateHash();
+        }
+        console.log("block mined: ", this.hash);
+    }
+
 }
 
 // initialize the blockchain itself 
@@ -32,6 +49,9 @@ class Blockchain {
         // the chain should be empty at first but
         // we add the fundamental genesis block manually into the chain 
         this.chain = [this.createGenesisBlock()];
+
+        // this is the difficulty that control how many Zeros needed to be added to the hash 
+        this.difficulty = 4;
     }
 
     // this method generate the first block in the chain 
@@ -52,8 +72,8 @@ class Blockchain {
     addBlock(newBlock) {
         // set the previous hash to the hash of the last block 
         newBlock.previoushash = this.getLatestBlock().hash;
-        // recalculate the hash for the block it self to update the hash 
-        newBlock.hash = newBlock.calculateHash();
+        // we changed how to obtian new block by using mining 
+        newBlock.mineBlock(this.difficulty);
         // push the new block to the chain 
         this.chain.push(newBlock);
     }
@@ -88,15 +108,12 @@ class Blockchain {
 //      create instance 
 //      add new blocks
 let andrewCoin = new Blockchain();
+
+console.log("Minig block 1 ...")
 andrewCoin.addBlock(new Block(1, "1/6/2025", { amount: 5 }));
+
+console.log("Minig block 2 ...")
 andrewCoin.addBlock(new Block(2, "5/6/2025", { amount: 10 }));
 
-console.log('is blockchain valid?', andrewCoin.isChainValid()); // true
 
-// this try to change the block 
-andrewCoin.chain[1].data = { amount: 100 };
-andrewCoin.chain[1].hash = andrewCoin.chain[1].calculateHash();
 
-console.log('is blockchain valid?', andrewCoin.isChainValid()); // false 
-
-// console.log(JSON.stringify(andrewCoin, null, 4));

@@ -110,6 +110,23 @@ class Blockchain {
         this.pendingTransactions.push(transaction);
     }
 
+    // to get the balance you check all the transactions that envolve your address and calculate it
+    getBalanceOfAddress(address) {
+        let balance = 0;
+
+        for (const block of this.chain) {
+            for (const trans of block.transactions) {
+                if (trans.fromAddress === address) {
+                    balance -= trans.amount;
+                }
+                if (trans.toAddress === address) {
+                    balance += trans.amount;
+                }
+            }
+        }
+        return balance;
+    }
+
     // simple method retun true or flase to check if the chain valid
     isChainValid() {
         // loop over the chain to check all blocks 

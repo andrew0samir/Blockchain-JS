@@ -62,6 +62,13 @@ class Blockchain {
 
         // this is the difficulty that control how many Zeros needed to be added to the hash 
         this.difficulty = 4;
+
+        // this is responsable for saving the pending transactions between the intervals 
+        // of mining blocks and added blocks into the blockchain
+        this.pendingTransactions = [];
+
+        // this control how much the miner gets as rewards
+        this.miningReward = 100;
     }
 
     // this method generate the first block in the chain 
@@ -78,14 +85,29 @@ class Blockchain {
         return this.chain[this.chain.length - 1];
     }
 
-    // method add new block into the chain 
-    addBlock(newBlock) {
-        // set the previous hash to the hash of the last block 
-        newBlock.previoushash = this.getLatestBlock().hash;
-        // we changed how to obtian new block by using mining 
-        newBlock.mineBlock(this.difficulty);
-        // push the new block to the chain 
-        this.chain.push(newBlock);
+    // removed the old way to mine
+    // this take address to add the reward to
+    minePendingTransactions(miningRewardAddress) {
+        // in real cryptocurrency adding all the pending transactions is impossible
+        // there are way too many transactions to be added to a block 
+        // cause the block size cant exceed 1 MB
+        // miners should be able to choose which transction to be added in real life
+        let block = new Block(Date.now(), this.pendingTransactions);
+        block.mineBlock(this.difficulty);
+
+        console.log("Block successfully mined");
+        this.chain.push(block);
+
+        // after adding the block to the chain 
+        // reset the transations and give the miner his reward
+        this.pendingTransactions = [
+            // dont need from address cause the system is the one giving the reward
+            new Transaction(null, miningRewardAddress, this.miningReward)
+        ];
+    }
+
+    createTransaction(transaction) {
+        this.pendingTransactions.push(transaction);
     }
 
     // simple method retun true or flase to check if the chain valid

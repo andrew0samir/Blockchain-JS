@@ -3,13 +3,23 @@
 // here we use sha256 to calculate the hashes
 const SHA256 = require('crypto-js/sha256');
 
+// transaction class control how the transactions look like
+class Transaction {
+    constructor(fromAddress, toAddress, amount) {
+        this.fromAddress = fromAddress;
+        this.toAddress = toAddress;
+        this.amount = amount;
+    }
+}
+
 // initialize blocks that go into our block chain
 // the hash used to reference blocks   
 class Block {
-    constructor(index, timestamp, data, previoushash = '') {
-        this.index = index;
+    // removed the index cause its the position is not controlled bu the index anymore
+    // changed the data argument into transations 
+    constructor(timestamp, transactions, previoushash = '') {
         this.timestamp = timestamp;
-        this.data = data;
+        this.transactions = transactions;
         this.previoushash = previoushash;
         this.hash = this.calculateHash();
         this.nonce = 0;
@@ -59,7 +69,7 @@ class Blockchain {
     // genesis block is the fundamental block 
     // it's the only block that have no previous hash (no data optionaly) 
     createGenesisBlock() {
-        return new Block(0, "25/5/2025", "Genesis block", "0")
+        return new Block("25/5/2025", "Genesis block", "0")
     }
 
     // method return the last block in the chain 
@@ -108,12 +118,6 @@ class Blockchain {
 //      create instance 
 //      add new blocks
 let andrewCoin = new Blockchain();
-
-console.log("Minig block 1 ...")
-andrewCoin.addBlock(new Block(1, "1/6/2025", { amount: 5 }));
-
-console.log("Minig block 2 ...")
-andrewCoin.addBlock(new Block(2, "5/6/2025", { amount: 10 }));
 
 
 

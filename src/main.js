@@ -1,3 +1,4 @@
+const { Blockchain, Transaction } = require("./blockchain");
 
 // for testing the address and transactions
 let andrewCoin = new Blockchain();

@@ -152,3 +152,6 @@ class Blockchain {
     }
 
 }
+
+module.export.Blockchain = Blockchain;
+module.export.Transaction = Transaction;
